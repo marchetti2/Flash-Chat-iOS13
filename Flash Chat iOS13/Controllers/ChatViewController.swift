@@ -11,7 +11,7 @@ import FirebaseAuth
 import FirebaseFirestore
 
 class ChatViewController: UIViewController {
-
+    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageTextfield: UITextField!
     
@@ -26,7 +26,7 @@ class ChatViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        tableView.delegate = self
+        //        tableView.delegate = self
         tableView.dataSource = self
         
         title = K.appTitle
