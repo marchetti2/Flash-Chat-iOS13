@@ -15,24 +15,45 @@ class ChatViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageTextfield: UITextField!
     
-    let messages:[Message] = [
-        Message(sender: "1@1.com", body: "Hey"),
-        Message(sender: "2@2.com", body: "Hello"),
-        Message(sender: "1@1.com", body: "How you doing? ijijij ijijij ijijiji ijijojoijoijoij")
-    ]
+    var messages:[Message] = []
     let db = Firestore.firestore()
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //        tableView.delegate = self
         tableView.dataSource = self
-        
         title = K.appTitle
         navigationItem.hidesBackButton = true
         
         tableView.register(UINib(nibName: K.cellNibName, bundle: nil), forCellReuseIdentifier: K.cellIdentifier)
+        loadMessages()
+    }
+    
+    func loadMessages() {
+        messages = []
+        
+        db.collection(K.FStore.collectionName).getDocuments { (querySnapshot, error) in
+            if let e = error {
+                print(e.localizedDescription)
+            } else {
+                if let documents = querySnapshot?.documents {
+                    for doc in documents {
+                        let data = doc.data()
+                        print(data)
+                        if let messageSender = data[K.FStore.senderField] as? String, let messageBody = data[K.FStore.bodyField] as? String {
+                            
+                            let message = Message(sender: messageSender, body: messageBody)
+                            self.messages.append(message)
+                            
+                            DispatchQueue.main.async {
+                                self.tableView.reloadData()
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+        
     }
     
     @IBAction func sendPressed(_ sender: UIButton) {
