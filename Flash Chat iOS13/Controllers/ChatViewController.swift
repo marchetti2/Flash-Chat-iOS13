@@ -8,6 +8,7 @@
 
 import UIKit
 import FirebaseAuth
+import FirebaseFirestore
 
 class ChatViewController: UIViewController {
 
@@ -19,6 +20,8 @@ class ChatViewController: UIViewController {
         Message(sender: "2@2.com", body: "Hello"),
         Message(sender: "1@1.com", body: "How you doing? ijijij ijijij ijijiji ijijojoijoijoij")
     ]
+    let db = Firestore.firestore()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +36,18 @@ class ChatViewController: UIViewController {
     }
     
     @IBAction func sendPressed(_ sender: UIButton) {
+        if let messageBody = messageTextfield.text, let messageSender = Auth.auth().currentUser?.email {
+            db.collection(K.FStore.collectionName).addDocument(data: [
+                K.FStore.senderField: messageSender,
+                K.FStore.bodyField: messageBody
+            ]) { error in
+                if let e = error {
+                    print(e)
+                } else {
+                    print("Successfully save data")
+                }
+            }
+        }
     }
     
     @IBAction func logOutPressed(_ sender: Any) {
